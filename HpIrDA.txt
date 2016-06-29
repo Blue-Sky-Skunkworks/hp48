@@ -1,0 +1,109 @@
+***********************************************
+* IR transfer between a PC and the HP38/39/48 *
+***********************************************
+
+There are several questions about transferring data from a PC to a HP and vice
+versa using the Infrared port.
+
+
+1) Hardware
+-----------
+
+Some theoretical aspects:
+
+Pulse width:
+ HP transmitter : typ = 52us, min = 46.8us, max = 57.2us
+ HP receiver    : typ = 52us, min = 40.0us, max = 80.0us
+ IrDA: 3/16 of Baudrate = 1/2400*3/16 = 78us or 1.6us
+Wavelength:
+ HP: 940nm
+ IrDA: 850..900nm
+
+Remember: You can only use this interface to connect with the 2400 Baud serial
+protocol, connecting the HP82240B infrared printer isn't possible.
+
+The first problem we have is the pulse width. If your PC IrDA interface is
+generating the pulse width with 3/16 of the baudrate it's OK, but there are
+several interfaces out there, which are using a 1.6us pulse width for all
+baudrates. That's too short for the HP IR interface, so no chance to get it
+working.
+
+
+2) Software protocol layer
+--------------------------
+
+Next we have to distinguish between the software protocol layers. The IrDA 1.0
+specification describes the hardware and the software protocol stack layer. The
+IrDA protocol stack defines several parts for data transport, especially the
+framing of the data. The framing isn't compatible with the HP one. An optional
+component is the IrCOMM layer which shows the IrDA hardware as virtual COM port.
+Here the application itself can make the framing. So you need an operating
+system which can access the IrCOMM layer of the IrDA hardware. The newer
+Microsoft Windows operating systems have an integrated IrDA support. That causes
+also problems. Here are my experiences with some MS Windows versions.
+
+
+3) Operating system
+-------------------
+
+I tested an Infrared connection with a Tekram IRmate IR-220 for motherboard
+connection supported by the BIOS on COM2 and with the IrDA interface of a Compaq
+Armada 1570D Laptop (fixed a resource problem with the factory setting of the
+IrDA port first). The testing distance was 5..30cm.
+
+- Win95:
+
+Only tested on the laptop, here it worked.
+
+- Win98:
+
+Only tested on the PC. Doesn't work, even when I disable the IrDA driver. I
+don't know what going wrong. Perhaps my fault.
+
+- WinNT4.0 SP3:
+
+Only tested on the PC. Worked with the Tekram IRmate IR-220 IR module.
+
+- Win2k SP1:
+
+Only tested on the PC. In this operating system the needed IrCOMM protocol stack
+layer for virtual COM ports is missing, so you need a 3rd party product. I tried
+it with a software driver for mobile phones, but it also don't work.
+
+
+4) Terminal applications
+------------------------
+
+For the first test I used a HP48 and Emu48 as software on the PC (OS NT4.0) and
+on the Laptop (OS Win95). I transferred an UserRpl file in binary mode. Both
+hardware works.
+
+As second test software I used MS-DOS Kermit 2.32/A. I tried to transfer the
+same UserRpl file in binary mode as before. With the Tekram adapter this work,
+the Compaq transfer fail!
+
+In general, the biggest problem is that you get IR reflections from the
+transmitter to your receiver while transmitting data. Before you receive the
+answer, the software has to clear the receive buffer. Some IrDA receiver
+hardware does this without software support, so most communication software will
+run on this hardware. Emu48 has no problems, because the original HP romcode is
+running, the HP clears the receive buffer after transmitting data. Most popular
+transfer software doesn't clear it's receive buffer after transmitting, so it
+mostly depends on your hardware if the IR transfer works. The Temic
+IrDA-Transceiver TFDS3000 for example has problems with the IR reflections from
+the transmitter, the newer TFDS4000 or TFDS4500 doesn't.
+
+So that's the reason of the different behavior or the Tekram IRmate IR-220 and
+of the Compaq Armada 1570D Laptop. The Tekram IRmate clears the IR reflections
+by hardware, the Laptop doesn't. Emu48, or better the emulated calculator, takes
+care about the reflections, so it worked also on the Laptop in this case.
+
+
+5) Result
+---------
+
+The IR transfer with IrDA hardware between PC and HP calculator might work, but
+because of the many exceptions, explained above, it mostly will fail.
+
+
+06/27/01 (c) by Christoph Gieﬂelink, cgiess@swol.de
